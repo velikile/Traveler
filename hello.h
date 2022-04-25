@@ -177,6 +177,7 @@ int getBitBoundryDelta(int num,int bitCount)
 	else 
 		return 0;
 }
+
 void writeToFile(const char* name,char * data,int size)
 {
 	FILE * fileHandle = fopen(name,"wb");
@@ -190,6 +191,11 @@ fileData readFile(const char * path)
 
 	fileData ret ={};	
 
+        if(!file)
+        {
+            return ret;
+        }
+
 	fseek(file,0,SEEK_END);
 	ret.sizeinBytes = ftell(file);
 	ret.data = malloc(ret.sizeinBytes);
@@ -197,9 +203,11 @@ fileData readFile(const char * path)
 	fread(ret.data,ret.sizeinBytes,1,file);
 	return ret;
 }
-Image produceRGBAPackedOutBMP(fileData d)//null termintaed string 
+Image produceRGBAPackedOutBMP(fileData d)
 {
 	Image ret={0};
+        if(d.sizeinBytes == 0)
+            return ret;
 	bmp_header h = *((bmp_header*)d.data);
 	printf("%c%c\n",h.signature,*((u_char*)&h.signature+1));
 	printf("%u\n",h.filesize);

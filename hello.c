@@ -84,7 +84,8 @@ int main(int argc,char ** argv)
 	srand(time(0));
 	fileData bmpFileData = readFile("testP.bmp");
 	Image texture = produceRGBAPackedOutBMP(bmpFileData);
-	free(bmpFileData.data);	
+        if(bmpFileData.sizeinBytes > 0)
+            free(bmpFileData.data);	
 	//writeToFile("rawData",(char*)texture.data,texture.width*texture.height*sizeof(rgbapixel));
 	Rect RectAddition ={0,0,20,20};
 
