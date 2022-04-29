@@ -378,7 +378,7 @@ int main(int argc,char ** argv)
         	}
         	if(sceneRects[i].x==0 &&sceneRects[i].y ==0)
         		continue;
-        	if(getDistanceFromPoint(sceneRects[i],shipState.p)>=250)
+        	if(getDistanceFromPoint(sceneRects[i],shipState.p)>=500)
         		continue;
         	
 
@@ -601,7 +601,7 @@ int main(int argc,char ** argv)
                        	case SDLK_f:
                        		fkey = (event.type==SDL_KEYDOWN);
                        		break;
-                   		case SDLK_q:
+                        case SDLK_q:
                        		qkey = (event.type==SDL_KEYDOWN);
 
                        		if (qkey && event.key.keysym.mod & KMOD_LCTRL){printf("ctrl q\n");}
@@ -620,7 +620,7 @@ int main(int argc,char ** argv)
 		midPointX = (x+x0+x1)/3;
 		midPointY = (y+y0+y1)/3;
 
-		if(down||left||up||right)
+		if(left||up||right)
 		{
 			if(!moving)
 			{
@@ -820,12 +820,12 @@ int main(int argc,char ** argv)
        			} 	
        		}
        		drawListRectsAndChangePositionForDraggedMousePosition(r,
-       															  currentList,
-       															  mouseBState,
-       															  mousePos,
-       															  &grabbedRect,
-       															  Trand,
-       															  toAddRender);
+                                                                      currentList,
+                                                                      mouseBState,
+                                                                      mousePos,
+                                                                      &grabbedRect,
+                                                                      Trand,
+                                                                      toAddRender);
        	}
        	if(moving)
        		render_fire(r,shipState,dirX,dirY,toAddRender,0,15,0,300);

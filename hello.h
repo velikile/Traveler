@@ -50,11 +50,11 @@ bool isPointOnVector(V2,V2,V2);
 
 bool timeToUpdate(int&,int,bool);
 bool drawListRectsAndChangePositionForDraggedMousePosition(SDL_Renderer* ,
-														   LLRect *,
-														   B3,
-														   V2,
-														   Rect**,
-														   SDL_Texture*,V2);
+                                                           LLRect *,
+                                                           B3,
+                                                           V2,
+                                                           Rect**,
+                                                           SDL_Texture*,V2);
 
 unsigned int reverseBits(unsigned int);
 void addRectToList(Rect rectToAdd,LLRect* toAddTo);
@@ -454,7 +454,7 @@ V2q getRectVecs(SDL_Rect r)
 
 V2p getIntersectionPoints(SDL_Rect r, V2 a, V2 b, V2 c,V2 dir)
 {
-	V2q rects =getRectVecs(r);
+	V2q rects = getRectVecs(r);
 	V2 bacacb[3] = {b-a,c-a,c-b};
 	V2 start = {r.x,r.y};
 	V2 aab[3] = {a,a,b};
@@ -523,11 +523,13 @@ V2 intersectionPoint(V2 a,V2 b,V2 c,V2 d )
 	}
 	return ret;
 }
+
 bool isPointOnVector(V2 a,V2 b,V2 c)
 {
 	float t = -(X(b,c))/X(c,a);
-	return !(t<0|| t>1);
+	return !(t<0 || t>1);
 }
+
 bool timeToUpdate(int &lastTime,int interval,bool update = false)
 {
 	int currentTime = SDL_GetTicks();
