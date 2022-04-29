@@ -651,14 +651,12 @@ int main(int argc,char ** argv)
 			}
 		}
 
-        if(down || up || left || right)
+        if(up || left || right)
         {
-        	dirX = (-(x1-midPointX)*ah.speed)*down +
-        		   ((x1-midPointX)*ah.speed)*up +
+        	dirX =     ((x1-midPointX)*ah.speed)*up +
         		   ((y1-midPointY)*ah.speed)*left +
         		   (-(y1-midPointY)*ah.speed)*right;
-       		dirY = (-(y1-midPointY)*ah.speed)*down +
-       		 	   ((y1-midPointY)*ah.speed)*up + 
+       		dirY =    ((y1-midPointY)*ah.speed)*up + 
        		 	   (-(x1-midPointX)*ah.speed)*left + 
        		 	   ((x1-midPointX)*ah.speed)*right;
 
