@@ -11,8 +11,7 @@
 #define worldRectsWidth 10
 #define worldRectsHeight 10
 
-int tree_texture_width = 1000,
-	tree_texture_height= 750;
+float tree_texture_width = 1000, tree_texture_height= 750;
 
 #define tree_size 100
 
@@ -345,6 +344,7 @@ BNode freeLeftRight(BNode* oldRoot)
 			oldRoot->left->right = 0;
 		}
 	}
+        return *oldRoot;
 }
 BNode rotate_right(BNode * n)
 {
@@ -372,6 +372,7 @@ BNode freeRightLeft(BNode* oldRoot)
 			oldRoot->right->left = 0;
 		}
 	}
+        return *oldRoot;
 }
 
 

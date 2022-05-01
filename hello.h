@@ -272,7 +272,7 @@ void simple_btree_renderer(BNode * n ,SDL_Renderer * r,V2 CurrentPos,V2p LeftRig
 	if(n)
 	{
 		SDL_SetRenderDrawColor(r,255,255,255,255);
-		Rect toRedner = {CurrentPos.x-2,CurrentPos.y-2,5,5};
+		Rect toRedner = {(int)(CurrentPos.x-2),(int)(CurrentPos.y-2),5,5};
 		SDL_RenderDrawRect(r,&toRedner);
 		if(n->left)
 		{
@@ -433,7 +433,7 @@ V2 getNearestNormal(SDL_Rect r,int x,int y)
 			retVal.y=(vec.x/lenV);
 		}
 	}
-	printf("%d,%d,%f\n",retVal.x,retVal.y,lenV);
+	printf("%f,%f,%f\n",retVal.x,retVal.y,lenV);
 	return retVal;
 }
 V2q getRectVecs(SDL_Rect r)
@@ -573,6 +573,7 @@ bool RemoveLastListElement(LLRect * head)
 			free(node);
 			return true;
 	}
+        return false;
 
 }
 void RemoveFromList(Rect *d ,LLRect * head)

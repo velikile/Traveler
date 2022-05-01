@@ -324,7 +324,7 @@ int main(int argc,char ** argv)
     {
     	startFrameTime = SDL_GetTicks();
         SDL_Event event;
-        V2 glideDtXY = {glideDt*.3*dirX,glideDt*.3*dirY};
+        V2 glideDtXY = {glideDt*.3f*dirX,glideDt*.3f*dirY};
         V2 toAddRender = {width/2-shipState.a.x,height/2-shipState.a.y};
         toAddRender+=glideDtXY;
         //Rect dest = {midPointX +toAddRender.x-50,midPointY+toAddRender.y-50,100,100};
