@@ -17,7 +17,6 @@ enum rect_menu
 	LARGE,
 	HOR,
 	VER,
-
 	RECT_MENU_COUNT,
 };
 struct dblclick
@@ -49,6 +48,8 @@ struct acceleration_handle
 	float topspeed;
 	float minspeed;
 	float speed;
+	float speedX;
+	float speedY;
 
 };
 
@@ -622,50 +623,29 @@ int main(int argc,char ** argv)
 
 		if(left||up||right)
 		{
-			if(!moving)
-			{
-				ah.speed+=ah.acceleration;
-
-				moving = true;
-				lastTimeSpeedChange = SDL_GetTicks();
-			}
-			else if(ah.speed<ah.topspeed)
-			{
-				if(timeToUpdate(lastTimeSpeedChange,10,true))
-				{
-					ah.speed += ah.acceleration;
-				}
-			}
+                    lastTimeSpeedChange = SDL_GetTicks();
+                    ah.speedX += (ah.speedX < ah.topspeed) *(ah.acceleration * left - ah.acceleration * right);
+                    ah.speedY += (ah.speedY < ah.topspeed) * ah.acceleration * up;
 		}
-		else if(ah.speed > ah.minspeed)
-		{	
-			// moving = false;
-			if(timeToUpdate(lastTimeSpeedChange,10,true))
-			{
-				ah.speed -= ah.acceleration;
-       			translateTriangle(x,y,x0,y0,x1,y1,dirX*ah.speed,dirY*ah.speed);
-				if(ah.speed <= ah.minspeed)
-				{
-					ah.speed = ah.minspeed;
-				}
-			}
-		}
+		else 
+                {
+                    if(ah.speedX > ah.minspeed)
+                    {	
+			ah.speedX -= ah.acceleration;
+			if(ah.speedX < ah.minspeed)
+                            ah.speedX = ah.minspeed;
+                    }
+                    if(ah.speedY > ah.minspeed)
+                    {	
+                        ah.speedY -= ah.acceleration;
+                        if(ah.speedY < ah.minspeed)
+                            ah.speedY = ah.minspeed;
+                    }
+                }
 
-        if(up || left || right)
-        {
-        	dirX =     ((x1-midPointX)*ah.speed)*up +
-        		   ((y1-midPointY)*ah.speed)*left +
-        		   (-(y1-midPointY)*ah.speed)*right;
-       		dirY =    ((y1-midPointY)*ah.speed)*up + 
-       		 	   (-(x1-midPointX)*ah.speed)*left + 
-       		 	   ((x1-midPointX)*ah.speed)*right;
-
-        	translateTriangle(x,y,x0,y0,x1,y1,dirX,dirY);
-        	printf("%.3f,%.3f,%.3f,%.3f\n",dirX,dirY,ah.speed,ah.acceleration);
-        	if(holdingRect && heldRect)
-        		(*heldRect)+=V(dirX,dirY);
-        }
-        else {moving = false;}
+        	//printf("%.3f,%.3f,%.3f,%.3f\n",dirX,dirY,ah.speed,ah.acceleration);
+//        	if(holdingRect && heldRect)
+ //       		(*heldRect)+=V(dirX,dirY);
 
         updateState(ekey,lastTimeRectColission,150,colissionRect);
       	updateState(qkey,lastTimeToggleVisible,100,RectMenuVisible);
@@ -786,18 +766,12 @@ int main(int argc,char ** argv)
        	}
        	if (wkey || skey)
        	{
-       		  rotate_ship(x,y,x0,y0,x1,y1,midPointX,midPointY,wkey * -0.05 + skey* 0.05);
-  			  if(moving)
-       		  {
-       			shipState.d.x =dirX;
-       			shipState.d.y= dirY;
-       		  }
-       		  if(!moving)
-       		  {
-       		  	dirX = -(x1-midPointX)*ah.speed;
-       			dirY = -(y1-midPointY)*ah.speed;
-       		  }
-       		 render_fire(r,shipState,dirX,dirY,toAddRender,0,10,30,100);
+            rotate_ship(x,y,x0,y0,x1,y1,midPointX,midPointY,wkey * -0.05 + skey* 0.05);
+            shipState.d.x =dirX;
+            shipState.d.y= dirY;
+       	    dirX = (x1-midPointX)*ah.speedX;
+       	    dirY = (y1-midPointY)*ah.speedY;
+            render_fire(r,shipState,dirX,dirY,toAddRender,0,10,30,100);
      	}
        	
        	if(currentList)
@@ -825,8 +799,13 @@ int main(int argc,char ** argv)
                                                                       Trand,
                                                                       toAddRender);
        	}
-       	if(moving)
-       		render_fire(r,shipState,dirX,dirY,toAddRender,0,15,0,300);
+       	if(ah.speedX > ah.minspeed || ah.speedY > ah.minspeed)
+        {
+            dirX =  (x1 - midPointX) * ah.speedX;
+            dirY =  (y1 - midPointY) * ah.speedY;
+            translateTriangle(x,y,x0,y0,x1,y1,dirX,dirY);
+            render_fire(r,shipState,dirX,dirY,toAddRender,0,15,0,300);
+        }
 
        	if(mouseBState.l)
        	{
