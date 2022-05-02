@@ -49,6 +49,7 @@ struct acceleration_handle
 	float minspeed;
 	float speed;
 	float speedX;
+	float speedNX;
 	float speedY;
 
 };
@@ -624,8 +625,9 @@ int main(int argc,char ** argv)
 		if(left||up||right)
 		{
                     lastTimeSpeedChange = SDL_GetTicks();
-                    ah.speedX += (ah.speedX < ah.topspeed) *(ah.acceleration * left - ah.acceleration * right);
-                    ah.speedY += (ah.speedY < ah.topspeed) * ah.acceleration * up;
+                    ah.speedX +=  (ah.speedX < ah.topspeed)   * ah.acceleration * left;
+                    ah.speedNX += (ah.speedNX < ah.topspeed) *  ah.acceleration * right;
+                    ah.speedY +=  (ah.speedY < ah.topspeed) *   ah.acceleration * up;
 		}
 		else 
                 {
@@ -634,6 +636,12 @@ int main(int argc,char ** argv)
 			ah.speedX -= ah.acceleration;
 			if(ah.speedX < ah.minspeed)
                             ah.speedX = ah.minspeed;
+                    }
+                    if(ah.speedNX > ah.minspeed)
+                    {	
+			ah.speedNX -= ah.acceleration;
+			if(ah.speedNX < ah.minspeed)
+                            ah.speedNX = ah.minspeed;
                     }
                     if(ah.speedY > ah.minspeed)
                     {	
@@ -769,8 +777,10 @@ int main(int argc,char ** argv)
             rotate_ship(x,y,x0,y0,x1,y1,midPointX,midPointY,wkey * -0.05 + skey* 0.05);
             shipState.d.x =dirX;
             shipState.d.y= dirY;
-       	    dirX = (x1-midPointX)*ah.speedX;
-       	    dirY = (y1-midPointY)*ah.speedY;
+            float perpX = -(y1-midPointY);
+            float perpY =  (x1-midPointX);
+       	    dirX = (x1-midPointX)*ah.speedY + perpX * (ah.speedNX - ah.speedX);
+       	    dirY = (y1-midPointY)*ah.speedY + perpY * (ah.speedNX - ah.speedX);
             render_fire(r,shipState,dirX,dirY,toAddRender,0,10,30,100);
      	}
        	
@@ -799,10 +809,12 @@ int main(int argc,char ** argv)
                                                                       Trand,
                                                                       toAddRender);
        	}
-       	if(ah.speedX > ah.minspeed || ah.speedY > ah.minspeed)
+       	if(ah.speedX > ah.minspeed || ah.speedNX > ah.minspeed || ah.speedY > ah.minspeed)
         {
-            dirX =  (x1 - midPointX) * ah.speedY;
-            dirY =  (y1 - midPointY) * ah.speedY;
+            float perpX = -(y1-midPointY);
+            float perpY =  (x1-midPointX);
+       	    dirX = (x1-midPointX)*ah.speedY + perpX * (ah.speedNX - ah.speedX);
+       	    dirY = (y1-midPointY)*ah.speedY + perpY * (ah.speedNX - ah.speedX);
             translateTriangle(x,y,x0,y0,x1,y1,dirX,dirY);
             render_fire(r,shipState,dirX,dirY,toAddRender,0,15,0,300);
         }
