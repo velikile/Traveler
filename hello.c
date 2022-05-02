@@ -801,7 +801,7 @@ int main(int argc,char ** argv)
        	}
        	if(ah.speedX > ah.minspeed || ah.speedY > ah.minspeed)
         {
-            dirX =  (x1 - midPointX) * ah.speedX;
+            dirX =  (x1 - midPointX) * ah.speedY;
             dirY =  (y1 - midPointY) * ah.speedY;
             translateTriangle(x,y,x0,y0,x1,y1,dirX,dirY);
             render_fire(r,shipState,dirX,dirY,toAddRender,0,15,0,300);
