@@ -405,6 +405,11 @@ inline bool operator!(B3 e)
 {
 	return !(e.l||e.r||e.m);
 }
+inline V2 operator-(V2 a)
+{
+    V2 ret = {-a.x,-a.y};
+    return ret;
+}
 inline float operator *(V2 a,V2 b)
 {
 	return a.x*b.x + a.y*b.y;

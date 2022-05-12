@@ -58,14 +58,37 @@ void DrawSurroundingPoints(SDL_Renderer *rnd,Rect r, V2 a, V2 b, V2 c)
     V2 corners[4]= {{r.x,r.y},{r.x + r.w,r.y},{r.x + r.w,r.y + r.h}, {r.x,r.y + r.h}};
     V2 dirs[3]= {a - mid,b - mid,c - mid};
     SDL_SetRenderDrawColor(rnd, 255,255,255, SDL_ALPHA_OPAQUE);
+    V2 min = {1000000,1000000};
+    V2 max = -min;
+    V2 points[12] = {};
+    int32_t count = 0; 
+    bool validPoints[12] = {};
     for(int i = 0 ; i< 4;i++)
     {
         for(int j = 0 ; j < 3; j++)
         {
             V2 pt = corners[i] + dirs[j]; 
+            points[count++] = pt;
+            min.x = min(pt.x,min.x);
+            max.x = max(pt.x,max.x);
+            min.y = min(pt.y,min.y);
+            max.y = max(pt.y,max.y);
+        }
+    }
+    for(int i = 0 ; i < 12;i++)
+    {
+        if(points[i].x == min.x || points[i].x == max.x)
+            validPoints[i] = true;
+        if(points[i].y == min.y || points[i].y == max.y)
+            validPoints[i] = true;
+        V2 pt = points[i]; 
+
+        if(validPoints[i])
+        {
             Rect rpt = {pt.x,pt.y,2,2};
             SDL_RenderFillRect(rnd,&rpt);
         }
+	printf("valid point index : %d , %u \n",i,validPoints[i]);
     }
 }
 
