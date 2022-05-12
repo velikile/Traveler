@@ -49,13 +49,6 @@ void RemoveFromList(Rect * d ,LLRect * head);
 bool isPointOnVector(V2,V2,V2);
 
 bool timeToUpdate(int&,int,bool);
-bool drawListRectsAndChangePositionForDraggedMousePosition(SDL_Renderer* ,
-                                                           LLRect *,
-                                                           B3,
-                                                           V2,
-                                                           Rect**,
-                                                           SDL_Texture*,V2);
-
 unsigned int reverseBits(unsigned int);
 void addRectToList(Rect rectToAdd,LLRect* toAddTo);
 void writeToFile(const char* name,char * data,int size);
@@ -324,17 +317,17 @@ void render_btree(SDL_Renderer *r,
 
 bool drawListRectsAndChangePositionForDraggedMousePosition(
 					SDL_Renderer* r,
-				    LLRect *head,
+				        LLRect *head,
 					B3 mouseBState,
 					V2 mousePos,
 					SDL_Rect** grabbedRect,
 					SDL_Texture *texture,
 					V2 offset=V(0,0))
 {
-	LLRect* node  =head;
+	LLRect* node  = head;
 	SDL_Rect* selected = 0;
 	float closest = MAX_INT;
-	int roll=20;;
+	int roll=20;
 	while(node)
 	{
 		Rect toDrawRect = node->e;
@@ -448,7 +441,6 @@ V2q getRectVecs(SDL_Rect r)
 	ret.d.x = 0;
 	ret.d.y = -r.h;
 	return ret;
-
 }
  
 

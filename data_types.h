@@ -20,7 +20,7 @@ float tree_texture_width = 1000, tree_texture_height= 750;
 #define min(x,y)(x-y<=0?x:y)
 #define sq(x)((x)*(x))
 #define swap(type,arr,i,j){type t = arr[i];arr[i] = arr[j]; arr[j] = t;}
-#define mal(type,size) (type*)malloc(sizeof(type)*size)
+#define mal(type,size) (type*)calloc(size,sizeof(type))
 #define zero(ptr,type) memset(ptr,0,sizeof(type))
 #define zeros(ptr,type,size) memset(ptr,0,size*sizeof(type))
 
