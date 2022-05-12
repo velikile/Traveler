@@ -414,6 +414,11 @@ inline V2 operator *(float a,V2 b)
 	V2 ret = {a*b.x ,a*b.y};
 	return ret;
 }
+inline V2 operator /(V2 b,int a)
+{
+	V2 ret = {b.x/a ,b.y/a};
+	return ret;
+}
 inline V2 operator -(V2 a,V2 b)
 {
 	V2 ret = {a.x-b.x ,a.y-b.y};

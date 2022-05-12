@@ -50,8 +50,24 @@ struct acceleration_handle
 	float speedX;
 	float speedNX;
 	float speedY;
-
 };
+
+void DrawSurroundingPoints(SDL_Renderer *rnd,Rect r, V2 a, V2 b, V2 c)
+{
+    V2 mid = (a + b + c)/3;
+    V2 corners[4]= {{r.x,r.y},{r.x + r.w,r.y},{r.x + r.w,r.y + r.h}, {r.x,r.y + r.h}};
+    V2 dirs[3]= {a - mid,b - mid,c - mid};
+    SDL_SetRenderDrawColor(rnd, 255,255,255, SDL_ALPHA_OPAQUE);
+    for(int i = 0 ; i< 4;i++)
+    {
+        for(int j = 0 ; j < 3; j++)
+        {
+            V2 pt = corners[i] + dirs[j]; 
+            Rect rpt = {pt.x,pt.y,2,2};
+            SDL_RenderFillRect(rnd,&rpt);
+        }
+    }
+}
 
 int main(int argc,char ** argv)
 {	
@@ -445,63 +461,63 @@ int main(int argc,char ** argv)
                         V2 B = V(x,y)  +toAddRender;//+DirVec;
                         V2 C = V(x1,y1)+toAddRender;//+DirVec;
                         Rect rectToTest ={sceneRects[i].x+toAddRender.x,
-                                                      sceneRects[i].y+toAddRender.y,
-                                                          sceneRects[i].w,
-                                                          sceneRects[i].h};
+                                          sceneRects[i].y+toAddRender.y,
+                                          sceneRects[i].w,
+                                          sceneRects[i].h};
                         V2p S = getIntersectionPoints(rectToTest,A,B,C,DirVec);
                         
                         if(S.active)
                         {
-                                V2 toAdd = perp(S.a-S.b);
-                                normalize(&toAdd);
-                                float da = getDistanceFromLine(S.a,S.b,A);
-                                float db = getDistanceFromLine(S.a,S.b,B);
-                                float dc = getDistanceFromLine(S.a,S.b,C);
-                                bool inA = inRect(rectToTest,A),
-                                     inB = inRect(rectToTest,B),
-                                         inC = inRect(rectToTest,C);
-                                
-                                if(inA&&inB){toAdd*=min(-da,-db);}
-                                else if(inA&&inC){toAdd*=max(-da,-dc);}
-                                else if(inA){toAdd*=-da;}
-                                else if(inB&&inC){toAdd*=min(-db,-dc);}
-                                else if(inB){toAdd*=-db;}
-                                else if(inC){toAdd*=-dc;}
+                            DrawSurroundingPoints(r,rectToTest,A,B,C);
+                            V2 toAdd = perp(S.a-S.b);
+                            normalize(&toAdd);
+                            float da = getDistanceFromLine(S.a,S.b,A);
+                            float db = getDistanceFromLine(S.a,S.b,B);
+                            float dc = getDistanceFromLine(S.a,S.b,C);
+                            bool inA = inRect(rectToTest,A),
+                             inB = inRect(rectToTest,B),
+                                 inC = inRect(rectToTest,C);
+                            
+                            if(inA&&inB){toAdd*=min(-da,-db);}
+                            else if(inA&&inC){toAdd*=max(-da,-dc);}
+                            else if(inA){toAdd*=-da;}
+                            else if(inB&&inC){toAdd*=min(-db,-dc);}
+                            else if(inB){toAdd*=-db;}
+                            else if(inC){toAdd*=-dc;}
 
-                                if(!inA && !inB && !inC)
+                            if(!inA && !inB && !inC)
+                            {
+                                V2q RectVecs = getRectVecs(rectToTest);
+                                V2 nextPoint ={rectToTest.x,rectToTest.y};
+
+                                for (int j = 0; j < 4; ++j)
                                 {
-                                        V2q RectVecs = getRectVecs(rectToTest);
-                                        V2 nextPoint ={rectToTest.x,rectToTest.y};
-
-                                        for (int j = 0; j < 4; ++j)
+                                        if(inRect(Trect+toAddRender,nextPoint))
                                         {
-                                                if(inRect(Trect+toAddRender,nextPoint))
-                                                {
-                                                        float d = getDistanceFromLine(S.a,S.b,nextPoint);
-                                                        toAdd*=d;
-                                                        break;
-                                                }
-                                                nextPoint = nextPoint+RectVecs.data[j]; 
+                                                float d = getDistanceFromLine(S.a,S.b,nextPoint);
+                                                toAdd*=d;
+                                                break;
                                         }
+                                        nextPoint = nextPoint+RectVecs.data[j]; 
                                 }
-                                
-                                SDL_SetRenderDrawColor(r, 255, 0, 255, SDL_ALPHA_OPAQUE);
-                                SDL_RenderDrawLine(r, midPointX+toAddRender.x, midPointY+toAddRender.y, midPointX + toAdd.x+toAddRender.x,midPointY + toAdd.y+toAddRender.y);
-
-                                if(colissionRect)
-                                {					
-                                        x+=toAdd.x;
-                                        y+=toAdd.y;
-                                        x0+=toAdd.x;
-                                        y0+=toAdd.y;
-                                        x1+=toAdd.x;
-                                        y1+=toAdd.y;
-                                }
-                        }
-                         SDL_SetRenderDrawColor(r, 255, 255, 0, SDL_ALPHA_OPAQUE);
-                         Rect renderCol = {Trect.x+toAddRender.x,Trect.y+toAddRender.y,Trect.w,Trect.h};
-                         // SDL_RenderDrawRect(r,&Trect);
-                         SDL_RenderDrawRect(r,&renderCol);
+                            }
+                            
+                            SDL_SetRenderDrawColor(r, 255, 0, 255, SDL_ALPHA_OPAQUE);
+                            SDL_RenderDrawLine(r, midPointX+toAddRender.x, midPointY+toAddRender.y, midPointX + toAdd.x+toAddRender.x,midPointY + toAdd.y+toAddRender.y);
+                            if(colissionRect)
+                            {					
+                                x+=toAdd.x;
+                                y+=toAdd.y;
+                                x0+=toAdd.x;
+                                y0+=toAdd.y;
+                                x1+=toAdd.x;
+                                y1+=toAdd.y;
+                            }
+                    }
+                     SDL_SetRenderDrawColor(r, 255, 255, 0, SDL_ALPHA_OPAQUE);
+                     Rect renderCol = {Trect.x+toAddRender.x,Trect.y+toAddRender.y,Trect.w,Trect.h};
+                     // SDL_RenderDrawRect(r,&Trect);
+                     SDL_RenderDrawRect(r,&renderCol);
         	}
     	}
 
@@ -844,14 +860,14 @@ int main(int argc,char ** argv)
        	}
        	if(grabbedRect && mouseBState.r)
        	{
-       		int distX = mousePos.x - grabbedRect->x-toAddRender.x;
-			int distY = mousePos.y - grabbedRect->y-toAddRender.y;
-       		grabbedRect->w = max(0,distX) ;
-       		grabbedRect->h = max(0,distY);
+       	    int distX = mousePos.x - grabbedRect->x-toAddRender.x;
+            int distY = mousePos.y - grabbedRect->y-toAddRender.y;
+            grabbedRect->w = max(0,distX) ;
+            grabbedRect->h = max(0,distY);
        	}
        	if(grabbedRect && mouseBState.m)
        	{
-       		RemoveFromList(grabbedRect,currentList);
+            RemoveFromList(grabbedRect,currentList);
        	} 
      	
      	shipState.a.x = midPointX;
