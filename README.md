@@ -4,6 +4,7 @@
 currently working on in game editor to create interesting levels to explore
 
 todo:
+angular velocity accumulation
 sound mixing
 texture mapping
 boundless camera movement 
