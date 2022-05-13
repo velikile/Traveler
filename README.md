@@ -4,13 +4,13 @@
 currently working on in game editor to create interesting levels to explore
 
 todo:
-angular velocity accumulation
-sound mixing
-texture mapping
-boundless camera movement 
-fix sketchy colission detection
-text rendering
-teleportation pads
+- angular velocity accumulation
+- sound mixing
+- texture mapping
+- boundless camera movement 
+- fix sketchy colission detection
+- text rendering
+- teleportation pads
 
 currently in:
 area based storage
