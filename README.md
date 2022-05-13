@@ -1,6 +1,6 @@
 # Traveler
 
-first 2d rocket game 
+2d rocket game 
 currently working on in game editor to create interesting levels to explore
 
 todo:
