@@ -75,6 +75,13 @@ void DrawSurroundingPoints(SDL_Renderer *rnd,Rect r, V2 a, V2 b, V2 c)
             max.y = max(pt.y,max.y);
         }
     }
+
+    V2 * previousPt = 0;
+    int32_t firstI = -1;
+    int32_t secondI = -1;
+    int32_t thirdI = -1;
+    int32_t previousI = -1;
+    int32_t ppreviousI = -1;
     for(int i = 0 ; i < 12;i++)
     {
         if(points[i].x == min.x || points[i].x == max.x)
@@ -85,10 +92,37 @@ void DrawSurroundingPoints(SDL_Renderer *rnd,Rect r, V2 a, V2 b, V2 c)
 
         if(validPoints[i])
         {
-            Rect rpt = {pt.x,pt.y,2,2};
+            Rect rpt = {pt.x,pt.y,3,3};
+            if(previousPt && ((previousI /3 == i/3) // related to the same corner
+                    || (i % 3 == previousI % 3))) 
+                SDL_RenderDrawLine(rnd,pt.x ,pt.y, previousPt->x ,previousPt->y);
+            if((ppreviousI != -1) && ((ppreviousI /3 == i/3) // related to the same corner
+                    || (i/3 -1 == ppreviousI/3 && i % 3 == ppreviousI % 3))) 
+                SDL_RenderDrawLine(rnd,pt.x ,pt.y, points[ppreviousI].x ,points[ppreviousI].y);
+
+            if (firstI > -1 && secondI == -1)
+                secondI = i;
+            if (secondI > -1 && thirdI == -1)
+                thirdI= i;
+            if(firstI == -1) 
+                firstI = i;
+            previousPt = &points[i];
+            ppreviousI = previousI;
+            previousI = i;
+
             SDL_RenderFillRect(rnd,&rpt);
         }
 	printf("valid point index : %d , %u \n",i,validPoints[i]);
+    }
+    if(previousPt)
+    {
+        SDL_SetRenderDrawColor(rnd, 255,0,255, SDL_ALPHA_OPAQUE);
+        if(previousI % 3 == firstI %3 )
+            SDL_RenderDrawLine(rnd,previousPt->x ,previousPt->y,points[firstI].x,points[firstI].y);
+        else if(previousI % 3 == secondI %3 )
+            SDL_RenderDrawLine(rnd,previousPt->x ,previousPt->y,points[secondI].x,points[secondI].y);
+        else if(previousI % 3 == thirdI%3 )
+            SDL_RenderDrawLine(rnd,previousPt->x ,previousPt->y,points[thirdI].x,points[thirdI].y);
     }
 }
 
@@ -150,19 +184,21 @@ int main(int argc,char ** argv)
 
 	int rectCounter=0;
 	
-	int amountOfRects =300;
+	int amountOfRects = 300;
 	Rect *sceneRects = mal(Rect,amountOfRects);
 	SDL_Color *rectColor = mal(Color,amountOfRects);
 	// unified coordinates system
 
 	Rect Trect = {};
+        int32_t rowCounter = 0;
+        int32_t colCounter = 0;
 	
 	for (int i = 0; i < amountOfRects; i++)
 	{
-		int x = random()%2000;
-		int y = random()%2000;
-		int w = random()%200+10;
-		int h = random()%200+10;
+		int x = (i % 10 == 0) ? 200 * colCounter++ : 200 * colCounter;
+		int y = (i % 10 == 0) ? 300 * (rowCounter++ + (colCounter = 0)) : 300 * rowCounter;
+		int w = 200;
+		int h = 100;
 
 		sceneRects[i].x=x;
 		sceneRects[i].y=y; 
@@ -358,7 +394,6 @@ int main(int argc,char ** argv)
 	//printf("%d,",pop_front(&TestQueue));
 	//printf("%d,",pop_front(&TestQueue));
 	//printf("%d,",pop_front(&TestQueue));
-	
 
     while (!done) 
     {
