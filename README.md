@@ -4,22 +4,22 @@
 currently working on in game editor to create interesting levels to explore
 
 ### Todo:
-- angular velocity accumulation
-- sound mixing
-- texture mapping
-- boundless camera movement 
-- fix sketchy colission detection
-- text rendering
-- teleportation pads
+- Angular velocity accumulation
+- Sound mixing
+- Texture mapping
+- Boundless camera movement 
+- Fix sketchy colission detection
+- Text rendering
+- Teleportation pads
 
 ### Supports:
-- spatial storage
-- simple hand coded colission detector rectangle vs triangle
-- acceleration based movement
-- gliding camera movement
-- multiple render targets 
-- simple zoom support
-- particle system for simple flame rendering 
+- Dpatial storage
+- Dimple hand coded colission detector rectangle vs triangle
+- Acceleration based movement
+- Gliding camera movement
+- Multiple render targets 
+- Simple zoom support
+- Particle system for simple flame rendering
 
 currenlty requires SDL 2.0  dll linkage and SDL.h symbols
 
