@@ -52,6 +52,23 @@ struct acceleration_handle
 	float speedY;
 };
 
+bool PointNextToLine(int32_t a ,int32_t b)
+{
+    //11/3 = 3 8/3 = 2   
+    return (a/3 == 3) && (b/3 == 0) || (a/3 == 0) && (b/3 == 3 );
+}
+void DrawFinalLine(SDL_Renderer* rnd,V2 * previousPt,V2 * points,int32_t previousI ,int32_t firstI, int32_t secondI)
+{
+    if(previousPt)
+    {
+        SDL_SetRenderDrawColor(rnd, 255,0,255, SDL_ALPHA_OPAQUE);
+        if(previousI % 3 == firstI % 3 && PointNextToLine(previousI,firstI))
+            SDL_RenderDrawLine(rnd,previousPt->x ,previousPt->y,points[firstI].x,points[firstI].y);
+        else if(previousI % 3 == secondI % 3 && PointNextToLine(previousI,secondI))
+            SDL_RenderDrawLine(rnd,previousPt->x ,previousPt->y,points[secondI].x,points[secondI].y);
+    }
+}
+
 void DrawSurroundingPoints(SDL_Renderer *rnd,Rect r, V2 a, V2 b, V2 c)
 {
     V2 mid = (a + b + c)/3;
@@ -77,9 +94,9 @@ void DrawSurroundingPoints(SDL_Renderer *rnd,Rect r, V2 a, V2 b, V2 c)
     }
 
     V2 * previousPt = 0;
+    V2 * ppreviousPt = 0;
     int32_t firstI = -1;
     int32_t secondI = -1;
-    int32_t thirdI = -1;
     int32_t previousI = -1;
     int32_t ppreviousI = -1;
     for(int i = 0 ; i < 12;i++)
@@ -97,15 +114,16 @@ void DrawSurroundingPoints(SDL_Renderer *rnd,Rect r, V2 a, V2 b, V2 c)
                     || (i % 3 == previousI % 3))) 
                 SDL_RenderDrawLine(rnd,pt.x ,pt.y, previousPt->x ,previousPt->y);
             if((ppreviousI != -1) && ((ppreviousI /3 == i/3) // related to the same corner
-                    || (i/3 -1 == ppreviousI/3 && i % 3 == ppreviousI % 3))) 
+                    || (i/3 -1 == ppreviousI/3 || (i/3 == 0) &&  (ppreviousI/3 == 3))&& i % 3 == ppreviousI % 3)) 
                 SDL_RenderDrawLine(rnd,pt.x ,pt.y, points[ppreviousI].x ,points[ppreviousI].y);
 
             if (firstI > -1 && secondI == -1)
                 secondI = i;
-            if (secondI > -1 && thirdI == -1)
-                thirdI= i;
+
             if(firstI == -1) 
                 firstI = i;
+
+            ppreviousPt = previousPt;
             previousPt = &points[i];
             ppreviousI = previousI;
             previousI = i;
@@ -114,16 +132,8 @@ void DrawSurroundingPoints(SDL_Renderer *rnd,Rect r, V2 a, V2 b, V2 c)
         }
 	printf("valid point index : %d , %u \n",i,validPoints[i]);
     }
-    if(previousPt)
-    {
-        SDL_SetRenderDrawColor(rnd, 255,0,255, SDL_ALPHA_OPAQUE);
-        if(previousI % 3 == firstI %3 )
-            SDL_RenderDrawLine(rnd,previousPt->x ,previousPt->y,points[firstI].x,points[firstI].y);
-        else if(previousI % 3 == secondI %3 )
-            SDL_RenderDrawLine(rnd,previousPt->x ,previousPt->y,points[secondI].x,points[secondI].y);
-        else if(previousI % 3 == thirdI%3 )
-            SDL_RenderDrawLine(rnd,previousPt->x ,previousPt->y,points[thirdI].x,points[thirdI].y);
-    }
+    DrawFinalLine(rnd,previousPt,points,previousI,firstI,secondI);
+    DrawFinalLine(rnd,ppreviousPt,points,ppreviousI,firstI,secondI);
 }
 
 int main(int argc,char ** argv)
