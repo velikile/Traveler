@@ -46,35 +46,93 @@ struct acceleration_handle
 	float acceleration;
 	float topspeed;
 	float minspeed;
-	float speed;
+        float angle;
 	float speedX;
 	float speedNX;
 	float speedY;
 };
+
+struct Polygon
+{
+    V2 * points;
+    int32_t count;
+};
+
+struct renderer
+{
+    SDL_Renderer * rnd;
+    V2 toAddRender;
+    bool active;
+
+} main_renderer;
 
 bool PointNextToLine(int32_t a ,int32_t b)
 {
     //11/3 = 3 8/3 = 2   
     return (a/3 == 3) && (b/3 == 0) || (a/3 == 0) && (b/3 == 3 );
 }
-void DrawFinalLine(SDL_Renderer* rnd,V2 * previousPt,V2 * points,int32_t previousI ,int32_t firstI, int32_t secondI)
+
+void InitRenderer(SDL_Renderer * rnd,V2 toAddRender)
 {
-    if(previousPt)
+    main_renderer.rnd = rnd ;
+    main_renderer.active = true;
+    main_renderer.toAddRender = toAddRender;
+}
+
+void UpdateRenderer(V2 toAddRender)
+{
+    if(main_renderer.active)
+        main_renderer.toAddRender = toAddRender;
+}
+
+void SetRenderDrawColor(uint8_t r,uint8_t g,uint8_t b, uint8_t a)
+{
+    if(main_renderer.active)
     {
-        SDL_SetRenderDrawColor(rnd, 255,0,255, SDL_ALPHA_OPAQUE);
-        if(previousI % 3 == firstI % 3 && PointNextToLine(previousI,firstI))
-            SDL_RenderDrawLine(rnd,previousPt->x ,previousPt->y,points[firstI].x,points[firstI].y);
-        else if(previousI % 3 == secondI % 3 && PointNextToLine(previousI,secondI))
-            SDL_RenderDrawLine(rnd,previousPt->x ,previousPt->y,points[secondI].x,points[secondI].y);
+        SDL_Renderer *rnd = main_renderer.rnd;
+        SDL_SetRenderDrawColor(rnd,r,g,b,a);
     }
 }
 
-void DrawSurroundingPoints(SDL_Renderer *rnd,Rect r, V2 a, V2 b, V2 c)
+
+void RenderDrawLine(V2 a , V2 b)
+{
+    if(main_renderer.active)
+    {
+        a += main_renderer.toAddRender;
+        b += main_renderer.toAddRender;
+        SDL_RenderDrawLine(main_renderer.rnd, a.x,a.y,b.x,b.y);
+    }
+}
+
+void DrawFinalLine(V2 * previousPt,V2 * points,int32_t previousI ,int32_t firstI, int32_t secondI)
+{
+    SDL_Renderer* rnd = main_renderer.rnd;
+    if(previousPt)
+    {
+        SetRenderDrawColor(255,0,255, SDL_ALPHA_OPAQUE);
+        if(previousI % 3 == firstI % 3 && PointNextToLine(previousI,firstI))
+            RenderDrawLine(*previousPt,points[firstI]);
+        else if(previousI % 3 == secondI % 3 && PointNextToLine(previousI,secondI))
+            RenderDrawLine(*previousPt,points[secondI]);
+    }
+}
+void RenderFillRect(Rect r)
+{
+    if(main_renderer.active)
+    {
+        r.x += main_renderer.toAddRender.x;
+        r.y += main_renderer.toAddRender.y;
+        SDL_RenderFillRect(main_renderer.rnd,&r);
+    }
+}
+
+void ProduceSurroundingPoints(Rect r, V2 a, V2 b, V2 c, Polygon &out_pol)
 {
     V2 mid = (a + b + c)/3;
     V2 corners[4]= {{r.x,r.y},{r.x + r.w,r.y},{r.x + r.w,r.y + r.h}, {r.x,r.y + r.h}};
     V2 dirs[3]= {a - mid,b - mid,c - mid};
-    SDL_SetRenderDrawColor(rnd, 255,255,255, SDL_ALPHA_OPAQUE);
+    SetRenderDrawColor(255,255,255, SDL_ALPHA_OPAQUE);
     V2 min = {1000000,1000000};
     V2 max = -min;
     V2 points[12] = {};
@@ -109,31 +167,30 @@ void DrawSurroundingPoints(SDL_Renderer *rnd,Rect r, V2 a, V2 b, V2 c)
 
         if(validPoints[i])
         {
+            out_pol.points[out_pol.count++] = pt; 
             Rect rpt = {pt.x,pt.y,3,3};
             if(previousPt && ((previousI /3 == i/3) // related to the same corner
                     || (i % 3 == previousI % 3))) 
-                SDL_RenderDrawLine(rnd,pt.x ,pt.y, previousPt->x ,previousPt->y);
-            if((ppreviousI != -1) && ((ppreviousI /3 == i/3) // related to the same corner
-                    || (i/3 -1 == ppreviousI/3 || (i/3 == 0) &&  (ppreviousI/3 == 3))&& i % 3 == ppreviousI % 3)) 
-                SDL_RenderDrawLine(rnd,pt.x ,pt.y, points[ppreviousI].x ,points[ppreviousI].y);
+                RenderDrawLine(pt, *previousPt);
+            if((ppreviousI != -1) && ((ppreviousI /3 == i/3) || (i/3 -1 == ppreviousI/3 || (i/3 == 0) &&  (ppreviousI/3 == 3))&& i % 3 == ppreviousI % 3)) 
+                RenderDrawLine(pt,*ppreviousPt);
 
             if (firstI > -1 && secondI == -1)
                 secondI = i;
 
-            if(firstI == -1) 
-                firstI = i;
+            firstI = firstI > -1 ? firstI: i;
 
             ppreviousPt = previousPt;
             previousPt = &points[i];
             ppreviousI = previousI;
             previousI = i;
 
-            SDL_RenderFillRect(rnd,&rpt);
+            RenderFillRect(rpt);
         }
 	printf("valid point index : %d , %u \n",i,validPoints[i]);
     }
-    DrawFinalLine(rnd,previousPt,points,previousI,firstI,secondI);
-    DrawFinalLine(rnd,ppreviousPt,points,ppreviousI,firstI,secondI);
+    DrawFinalLine(previousPt,points,previousI,firstI,secondI);
+    DrawFinalLine(ppreviousPt,points,ppreviousI,firstI,secondI);
 }
 
 int main(int argc,char ** argv)
@@ -234,6 +291,9 @@ int main(int argc,char ** argv)
     }
 
     SDL_CreateWindowAndRenderer(width, height, 0, &w, &r);
+    V2p shipState= {width/2,height/2};
+    V2 toAddRender = {width/2-shipState.a.x,height/2-shipState.a.y};
+    InitRenderer(r,toAddRender);
 	SDL_SetRenderDrawBlendMode(r,SDL_BLENDMODE_BLEND);
 	screenSurface = SDL_GetWindowSurface(w);
  
@@ -366,7 +426,6 @@ int main(int argc,char ** argv)
 	int rotateSpeed =2;
 	bool moving = false;
 
-	V2p shipState= {width/2,height/2};
 	//shipState.p.x =width/2,shipState.p.y = height/2;
 	int startFrameTime = 0;
 	int  baseFrameRate = 16;
@@ -410,9 +469,9 @@ int main(int argc,char ** argv)
     	startFrameTime = SDL_GetTicks();
         SDL_Event event;
         V2 glideDtXY = {glideDt*.3f*dirX,glideDt*.3f*dirY};
-        V2 toAddRender = {width/2-shipState.a.x,height/2-shipState.a.y};
-        toAddRender+=glideDtXY;
-        //Rect dest = {midPointX +toAddRender.x-50,midPointY+toAddRender.y-50,100,100};
+        toAddRender = {width/2-shipState.a.x,height/2-shipState.a.y};
+        toAddRender += glideDtXY;
+        UpdateRenderer(toAddRender);
         Rect dest = {0,0,width,height};
 
        	SDL_SetRenderTarget(r,tx0);
@@ -525,18 +584,20 @@ int main(int argc,char ** argv)
                         }
                         
                         V2 DirVec = V(dirX,dirY);
-                        V2 A = V(x0,y0)+toAddRender;//+DirVec;
-                        V2 B = V(x,y)  +toAddRender;//+DirVec;
-                        V2 C = V(x1,y1)+toAddRender;//+DirVec;
-                        Rect rectToTest ={sceneRects[i].x+toAddRender.x,
-                                          sceneRects[i].y+toAddRender.y,
+                        V2 A = V(x0,y0);
+                        V2 B = V(x,y)  ;
+                        V2 C = V(x1,y1);
+                        Rect rectToTest ={sceneRects[i].x,
+                                          sceneRects[i].y,
                                           sceneRects[i].w,
                                           sceneRects[i].h};
                         V2p S = getIntersectionPoints(rectToTest,A,B,C,DirVec);
                         
+                        V2 points[8] = {};
+                        Polygon p = {points,0};
                         if(S.active)
                         {
-                            DrawSurroundingPoints(r,rectToTest,A,B,C);
+                            ProduceSurroundingPoints(rectToTest,A,B,C,p);
                             V2 toAdd = perp(S.a-S.b);
                             normalize(&toAdd);
                             float da = getDistanceFromLine(S.a,S.b,A);
@@ -864,7 +925,10 @@ int main(int argc,char ** argv)
             float perpY =  (x1-midPointX);
        	    dirX = (x1-midPointX)*ah.speedY + perpX * (ah.speedNX - ah.speedX);
        	    dirY = (y1-midPointY)*ah.speedY + perpY * (ah.speedNX - ah.speedX);
-            render_fire(r,shipState,dirX,dirY,toAddRender,0,10,30,100);
+            if(wkey && !skey)
+                render_fire(r,shipState,dirX,dirY,toAddRender,0,10,30,100);
+            if(!wkey && skey)
+                render_fire(r,shipState,-dirX,-dirY,toAddRender,0,10,30,100);
      	}
        	
        	if(currentList)
