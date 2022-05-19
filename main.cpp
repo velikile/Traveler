@@ -632,7 +632,8 @@ int main(int argc,char ** argv)
                             }
                             
                             SDL_SetRenderDrawColor(r, 255, 0, 255, SDL_ALPHA_OPAQUE);
-                            SDL_RenderDrawLine(r, midPointX+toAddRender.x, midPointY+toAddRender.y, midPointX + toAdd.x+toAddRender.x,midPointY + toAdd.y+toAddRender.y);
+                            V2 midpoint = {midPointX,midPointY};
+                            RenderDrawLine(midpoint,midpoint + toAdd);
                             if(colissionRect)
                             {					
                                 x+=toAdd.x;
@@ -918,17 +919,19 @@ int main(int argc,char ** argv)
        	}
        	if (wkey || skey)
        	{
-            rotate_ship(x,y,x0,y0,x1,y1,midPointX,midPointY,wkey * -0.05 + skey* 0.05);
+            float rotspeed = 0.05f;
+            float rotmul = 0.2f;
+            rotate_ship(x,y,x0,y0,x1,y1,midPointX,midPointY,wkey * -rotspeed + skey * rotspeed);
             shipState.d.x =dirX;
             shipState.d.y= dirY;
             float perpX = -(y1-midPointY);
             float perpY =  (x1-midPointX);
-       	    dirX = (x1-midPointX)*ah.speedY + perpX * (ah.speedNX - ah.speedX);
-       	    dirY = (y1-midPointY)*ah.speedY + perpY * (ah.speedNX - ah.speedX);
+       	    dirX = ((x1-midPointX)*ah.speedY + perpX * (ah.speedNX - ah.speedX))*rotmul;
+       	    dirY = ((y1-midPointY)*ah.speedY + perpY * (ah.speedNX - ah.speedX))*rotmul;
             if(wkey && !skey)
                 render_fire(r,shipState,dirX,dirY,toAddRender,0,10,30,100);
             if(!wkey && skey)
-                render_fire(r,shipState,-dirX,-dirY,toAddRender,0,10,30,100);
+                render_fire(r,shipState,-dirY,dirX,toAddRender,0,10,30,100);
      	}
        	
        	if(currentList)
@@ -963,7 +966,7 @@ int main(int argc,char ** argv)
        	    dirX = (x1-midPointX)*ah.speedY + perpX * (ah.speedNX - ah.speedX);
        	    dirY = (y1-midPointY)*ah.speedY + perpY * (ah.speedNX - ah.speedX);
             translateTriangle(x,y,x0,y0,x1,y1,dirX,dirY);
-            render_fire(r,shipState,dirX,dirY,toAddRender,0,15,0,300);
+            //render_fire(r,shipState,dirX,dirY,toAddRender,0,15,0,300);
         }
 
        	if(mouseBState.l)
