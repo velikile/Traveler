@@ -404,10 +404,10 @@ int main(int argc,char ** argv)
 
 	acceleration_handle ah = {};
 	ah.acceleration = 0.001f;
-	ah.rotacceleration = 0.05f;
+	ah.rotacceleration = 0.01f;
 	ah.topspeed = .2f;
 	ah.minspeed = 0;
-        ah.drag = 0.9;
+        ah.drag = 0.92;
 		
 	// Rect recttorender = {0,0,texture.width,texture.height};  
 	Rect recttorender = {0,0,texture.width,texture.height};  
