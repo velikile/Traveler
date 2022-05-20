@@ -4,7 +4,6 @@
 currently working on in game editor to create interesting levels to explore
 
 ### Todo:
-- Angular velocity accumulation
 - Sound mixing
 - Texture mapping
 - Boundless camera movement 
