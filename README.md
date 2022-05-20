@@ -20,9 +20,12 @@ currently working on in game editor to create interesting levels to explore
 - Simple zoom support
 - Particle system for simple flame rendering
 
-currenlty requires SDL 2.0  dll linkage and SDL.h symbols
+currenlty requires SDL 2.0 dll linkage and SDL.h include symbols
 
 tested using g++ compiler and cygwin64 on win10 x64
+
+### Ubuntu packages sdl
+https://packages.ubuntu.com/search?keywords=sdl2
 
 ## build 
 ```
