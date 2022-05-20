@@ -24,7 +24,11 @@ currenlty requires SDL 2.0  dll linkage and SDL.h symbols
 
 tested using g++ compiler and cygwin64 on win10 x64
 
+## build 
+```
+./build.sh
 
+```
 
 
 
