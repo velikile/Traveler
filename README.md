@@ -12,15 +12,15 @@ currently working on in game editor to create interesting levels to explore
 - Teleportation pads
 
 ### Supports:
-- Dpatial storage
-- Dimple hand coded colission detector rectangle vs triangle
+- Spatial storage (grid based)
+- Hand coded colission detector rectangle vs triangle
 - Acceleration based movement
 - Gliding camera movement
 - Multiple render targets 
 - Simple zoom support
 - Particle system for simple flame rendering
 
-currenlty requires SDL 2 dll linkage and SDL.h include symbols
+currenlty requires SDL 2 dll linkage and SDL.h symbols
 
 tested using g++ compiler and cygwin64 on win10 x64
 
